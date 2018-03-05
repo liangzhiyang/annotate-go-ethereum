@@ -1,5 +1,21 @@
 ## Go Ethereum
 
+源码注解
+
+基于release/1.8
+
+切换到note分支 建议使用ide的代码提示和跳转等功能阅读, 所以目录结构要正确 可以：
+
+cd $GOPATH/src/github.com/ethereum/
+git clone https://github.com/liangzhiyang/annotate-go-ethereum.git
+mv annotate-grpc-go grpc
+如果 grpc 已经存在
+
+cd $GOPATH/src/github.com/ethereum/
+git remote add lzy  https://github.com/liangzhiyang/annotate-go-ethereum.git
+git fetch --all
+git checkout -b note lzy/note
+
 Official golang implementation of the Ethereum protocol.
 
 [![API Reference](
