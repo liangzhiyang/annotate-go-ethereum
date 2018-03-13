@@ -143,6 +143,7 @@ func (n *Node) Start() error {
 	if n.server != nil {
 		return ErrNodeRunning
 	}
+	//这个里面会锁住当前工作目录，防止另一个进程实例占用
 	if err := n.openDataDir(); err != nil {
 		return err
 	}
@@ -163,6 +164,7 @@ func (n *Node) Start() error {
 		n.serverConfig.NodeDatabase = n.config.NodeDB()
 	}
 	running := &p2p.Server{Config: n.serverConfig}
+	//这就是启动后你能看到的第一条日志
 	n.log.Info("Starting peer-to-peer node", "instance", n.serverConfig.Name)
 
 	// Otherwise copy and specialize the P2P configuration

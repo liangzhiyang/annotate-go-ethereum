@@ -148,7 +148,7 @@ var (
 
 func init() {
 	// Initialize the CLI app and start Geth
-	app.Action = geth
+	app.Action = geth  //main函数里面调用app.run 的时候 默认情况下会调用这个 方法
 	app.HideVersion = true // we have a command to print the version
 	app.Copyright = "Copyright 2013-2017 The go-ethereum Authors"
 	app.Commands = []cli.Command{
@@ -205,6 +205,7 @@ func init() {
 }
 
 func main() {
+	//这个里面会调用geth方法
 	if err := app.Run(os.Args); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -215,7 +216,7 @@ func main() {
 // It creates a default node based on the command line arguments and runs it in
 // blocking mode, waiting for it to be shut down.
 func geth(ctx *cli.Context) error {
-	node := makeFullNode(ctx)
+	node := makeFullNode(ctx) //这个里面会注册Ethereum对象
 	startNode(ctx, node)
 	node.Wait()
 	return nil
@@ -226,6 +227,7 @@ func geth(ctx *cli.Context) error {
 // miner.
 func startNode(ctx *cli.Context, stack *node.Node) {
 	// Start up the node itself
+	//里面会执行 Ethereum.Start
 	utils.StartNode(stack)
 
 	// Unlock any account specifically requested
@@ -286,6 +288,7 @@ func startNode(ctx *cli.Context, stack *node.Node) {
 			utils.Fatalf("Light clients do not support mining")
 		}
 		var ethereum *eth.Ethereum
+		//获取node节点里面之前注册的Ethereum对象
 		if err := stack.Service(&ethereum); err != nil {
 			utils.Fatalf("Ethereum service not running: %v", err)
 		}

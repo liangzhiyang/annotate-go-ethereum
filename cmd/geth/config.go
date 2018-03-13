@@ -153,6 +153,7 @@ func enableWhisper(ctx *cli.Context) bool {
 func makeFullNode(ctx *cli.Context) *node.Node {
 	stack, cfg := makeConfigNode(ctx)
 
+	//注册etherum服务
 	utils.RegisterEthService(stack, &cfg.Eth)
 
 	if ctx.GlobalBool(utils.DashboardEnabledFlag.Name) {

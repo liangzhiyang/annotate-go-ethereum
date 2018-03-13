@@ -1130,6 +1130,7 @@ func RegisterEthService(stack *node.Node, cfg *eth.Config) {
 			return les.New(ctx, cfg)
 		})
 	} else {
+		//注册之后，当node再start的时候，就会记录Ethereum这个对象
 		err = stack.Register(func(ctx *node.ServiceContext) (node.Service, error) {
 			fullNode, err := eth.New(ctx, cfg)
 			if fullNode != nil && cfg.LightServ > 0 {
