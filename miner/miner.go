@@ -66,7 +66,7 @@ func New(eth Backend, config *params.ChainConfig, mux *event.TypeMux, engine con
 		canStart: 1,
 	}
 	miner.Register(NewCpuAgent(eth.BlockChain(), engine))
-	go miner.update()
+	go miner.update() //这里监听有没有同步事件
 
 	return miner
 }
@@ -80,7 +80,7 @@ func (self *Miner) update() {
 out:
 	for ev := range events.Chan() {
 		switch ev.Data.(type) {
-		case downloader.StartEvent:
+		case downloader.StartEvent://开始下载的时候，停止miner
 			atomic.StoreInt32(&self.canStart, 0)
 			if self.Mining() {
 				self.Stop()
@@ -93,7 +93,7 @@ out:
 			atomic.StoreInt32(&self.canStart, 1)
 			atomic.StoreInt32(&self.shouldStart, 0)
 			if shouldStart {
-				self.Start(self.coinbase)
+				self.Start(self.coinbase)//同步数据之后，在启动miner
 			}
 			// unsubscribe. we're only interested in this event once
 			events.Unsubscribe()
