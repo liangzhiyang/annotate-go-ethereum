@@ -78,14 +78,14 @@ func (self *CpuAgent) Start() {
 func (self *CpuAgent) update() {
 out:
 	for {
-		select {
+		select {//调用worker.commitNewWork()的时候，这里会进来，如果上一次的mine没有结束，会强制结束，重新mine
 		case work := <-self.workCh:
 			self.mu.Lock()
 			if self.quitCurrentOp != nil {
 				close(self.quitCurrentOp)
 			}
 			self.quitCurrentOp = make(chan struct{})
-			go self.mine(work, self.quitCurrentOp)
+			go self.mine(work, self.quitCurrentOp) //这里异步调用
 			self.mu.Unlock()
 		case <-self.stop:
 			self.mu.Lock()
@@ -98,7 +98,8 @@ out:
 		}
 	}
 }
-
+//调用共识算法的seal给打包好的块授权(这里指的是找到合法的nonce放在区块头中)
+//如果成功则写回去到returnCh，其实就是worker.recv,  这样在worker.wait方法里面就会收到消息
 func (self *CpuAgent) mine(work *Work, stop <-chan struct{}) {
 	if result, err := self.engine.Seal(self.chain, work.Block, stop); result != nil {
 		log.Info("Successfully sealed new block", "number", result.Number(), "hash", result.Hash())

@@ -385,7 +385,12 @@ func (self *worker) makeCurrent(parent *types.Block, header *types.Header) error
 	self.current = work
 	return nil
 }
-
+//这里是提交work用于挖矿的入口，有四种情况会进来，
+// 1，start方法,
+// 2. newWorker方法
+// 3. update 方法里面收到ChainHeadEvent 消息的时候 （这个消息有两种情况出发，一个是其它结点同步过来新块的时候，一个是自己本地挖矿成功）
+// 4. wait 方法里面等到一个新块被授权完毕之后，也会调用
+// 上面的情况会存在并发调用的情况，，但是执行是串行的，因为有锁
 func (self *worker) commitNewWork() {
 	self.mu.Lock()
 	defer self.mu.Unlock()
@@ -489,6 +494,8 @@ func (self *worker) commitNewWork() {
 		self.unconfirmed.Shift(work.Block.NumberU64() - 1)
 	}
 	self.push(work)
+	//这里仅仅是把work对象放到chan里面去，
+	//CpuAgent.update()方法里面会收到
 }
 
 func (self *worker) commitUncle(work *Work, uncle *types.Header) error {
